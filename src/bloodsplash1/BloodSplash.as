@@ -6,17 +6,19 @@
  * To change this template use File | Settings | File Templates.
  */
 package bloodsplash1 {
-import alternativa.engine3d.core.Resource;
-import alternativa.engine3d.materials.Material;
-import alternativa.engine3d.materials.TextureMaterial;
-import alternativa.engine3d.objects.AnimSprite;
-import alternativa.engine3d.resources.BitmapTextureResource;
 
-import flash.display.BitmapData;
+	import alternativa.engine3d.core.Resource;
+	import alternativa.engine3d.materials.Material;
+	import alternativa.engine3d.materials.TextureMaterial;
+	import alternativa.engine3d.objects.AnimSprite;
+	import alternativa.engine3d.resources.BitmapTextureResource;
 
-public class BloodSplash extends AnimSprite{
-    [Embed ("Blood_2.00001.png")] private static const blood01:Class;
-    [Embed ("Blood_2.00000.png")] private static const blood00:Class;
+	import flash.display.BitmapData;
+
+	public class BloodSplash extends AnimSprite{
+
+	[Embed ("Blood_2.00000.png")] private static const blood00:Class;
+	[Embed ("Blood_2.00001.png")] private static const blood01:Class;
     [Embed ("Blood_2.00002.png")] private static const blood02:Class;
     [Embed ("Blood_2.00003.png")] private static const blood03:Class;
     [Embed ("Blood_2.00004.png")] private static const blood04:Class;
@@ -32,13 +34,13 @@ public class BloodSplash extends AnimSprite{
     [Embed ("Blood_2.00014.png")] private static const blood14:Class;
     [Embed ("Blood_2.00015.png")] private static const blood15:Class;
 
-    private var resources:Vector.<Resource> = new <Resource>[];
+    private var resources:Vector.<Resource> = new Vector.<Resource>();
     public function BloodSplash() {
         super(100, 100);
         alwaysOnTop = true;
-        var materials = new <Material>[];
-        materials.push(createTextureMaterial(blood01));
-        materials.push(createTextureMaterial(blood00));
+        var materials:Vector.<Material> = new Vector.<Material>();
+		materials.push(createTextureMaterial(blood00));
+		materials.push(createTextureMaterial(blood01));
         materials.push(createTextureMaterial(blood02));
         materials.push(createTextureMaterial(blood03));
         materials.push(createTextureMaterial(blood04));
@@ -54,16 +56,15 @@ public class BloodSplash extends AnimSprite{
         materials.push(createTextureMaterial(blood14));
         materials.push(createTextureMaterial(blood15));
         this.materials = materials;
-
     }
 
     private function createTextureMaterial(asset:Class):Material {
        var bdata:BitmapData = (new asset()).bitmapData;
-        var resource = new BitmapTextureResource(bdata);
-        var materia = new TextureMaterial(resource);
-        materia.alphaThreshold = .5;
+        var resource:BitmapTextureResource = new BitmapTextureResource(bdata);
+        var material:TextureMaterial = new TextureMaterial(resource);
+        material.alphaThreshold = 1.1;
         resources.push(resource);
-        return materia;
+        return material;
     }
 
     override public function getResources(hierarchy:Boolean = false, resourceType:Class = null):Vector.<Resource> {
@@ -71,7 +72,7 @@ public class BloodSplash extends AnimSprite{
         var out:Vector.<Resource> = res.concat(resources);
         trace(out)
         return (out);
-
     }
-}
+
+	}
 }

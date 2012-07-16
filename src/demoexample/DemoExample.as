@@ -15,9 +15,9 @@ package demoexample {
 	import alternativa.engine3d.controllers.SimpleObjectController;
 	import alternativa.engine3d.core.Camera3D;
 	import alternativa.engine3d.core.Object3D;
-import alternativa.engine3d.core.RayIntersectionData;
-import alternativa.engine3d.core.Resource;
-import alternativa.engine3d.core.View;
+	import alternativa.engine3d.core.RayIntersectionData;
+	import alternativa.engine3d.core.Resource;
+	import alternativa.engine3d.core.View;
 	import alternativa.engine3d.core.events.MouseEvent3D;
 	import alternativa.engine3d.loaders.ParserCollada;
 	import alternativa.engine3d.materials.FillMaterial;
@@ -27,9 +27,9 @@ import alternativa.engine3d.core.View;
 	import alternativa.engine3d.primitives.GeoSphere;
 	import alternativa.engine3d.resources.BitmapTextureResource;
 
-import bloodsplash1.BloodSplash;
+	import explosion1.GrenadeExplosion;
 
-import flash.display.Sprite;
+	import flash.display.Sprite;
 	import flash.display.Stage3D;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -75,15 +75,18 @@ import flash.display.Sprite;
 		private var lastTime:int;
 		
 		private var timeScale:Number = 0.7;
-        private var bang:BloodSplash;
-		
+//        private var effect:BloodSplash;
+        private var effect:GrenadeExplosion;
+//        private var effect:GrenadeSmoke;
+
 		public function DemoExample() {
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
 			stage3D = stage.stage3Ds[0];
 			stage3D.addEventListener(Event.CONTEXT3D_CREATE, init);
-			stage3D.requestContext3D(Context3DRenderMode.SOFTWARE);
+//			stage3D.requestContext3D(Context3DRenderMode.SOFTWARE);
+			stage3D.requestContext3D(Context3DRenderMode.AUTO);
 		}
 		
 		protected function init(e:Event):void {
@@ -107,8 +110,6 @@ import flash.display.Sprite;
 			sphere.geometry.upload(stage3D.context3D);
 			scene.addChild(sphere);
 
-
-			
 			// Parser of level
 			// Парсер уровня
 			var levelParser:ParserCollada = new ParserCollada();
@@ -124,8 +125,8 @@ import flash.display.Sprite;
 			
 			// Adding double click listener
 			// Подписка уровня на двойной клик
-			level.useHandCursor = true;
-			level.doubleClickEnabled = true;
+//			level.useHandCursor = true;
+//			level.doubleClickEnabled = true;
 //			level.addEventListener(MouseEvent3D.DOUBLE_CLICK, onDoubleClick);
 			
 			// Parser of character
@@ -136,16 +137,24 @@ import flash.display.Sprite;
 			var characterResource:BitmapTextureResource = new BitmapTextureResource(new CharacterTexture().bitmapData);
 			var characterMaterial:TextureMaterial = new TextureMaterial(characterResource);
 			character.setMaterialToAllSurfaces(characterMaterial);
-            character.boundBox = level.boundBox;
+//            character.boundBox = level.boundBox;
+            character.boundBox = null;
             character.doubleClickEnabled = true;
             scene.addChild(character);
 
-            character.addEventListener(MouseEvent3D.CLICK, clickHandler);
+            scene.addEventListener(MouseEvent3D.MOUSE_DOWN, clickHandler);
 
-            bang = new BloodSplash();
-            for each (var res:Resource in bang.getResources(true))
+//			GrenadeExplosion.generateMaterials("Explosion.", "explosion", 51);
+//			GrenadeSmoke.generateMaterials("Smoke.", "smoke", 85);
+
+//			effect = new BloodSplash();
+          effect = new GrenadeExplosion();
+//            effect = new GrenadeSmoke();
+
+            for each (var res:Resource in effect.getResources(true)) {
                 res.upload(stage3D.context3D);
-            scene.addChild(bang);
+			}
+            scene.addChild(effect);
 			// Upload
 			characterResource.upload(stage3D.context3D);
 			character.geometry.upload(stage3D.context3D);
@@ -190,16 +199,17 @@ import flash.display.Sprite;
             var direction:Vector3D = new Vector3D();
             camera.calculateRay(origin, direction, mouseX, mouseY);
             var rayData:RayIntersectionData = scene.intersectRay(origin, direction);
-            trace("boo");
-            bang.frame = 0;
-            bang.x = rayData.point.x;
-            bang.y = rayData.point.y;
-            bang.z = rayData.point.z;}
+//            trace("boo");
+            effect.frame = 0;
+            effect.x = rayData.point.x;
+            effect.y = rayData.point.y;
+            effect.z = rayData.point.z;
+		}
 		
 		private function onEnterFrame(e:Event):void {
 
-//            if (bang.frame == bang.materials.length - 1 && rootContainer.contains(bang)) rootContainer.removeChild(bang);
-            bang.frame++;
+//            if (effect.frame == effect.materials.length - 1 && rootContainer.contains(effect)) rootContainer.removeChild(effect);
+            effect.frame++;
 			// Time of frame
 			// Время кадра
 			var time:int = getTimer();
