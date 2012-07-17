@@ -31,58 +31,33 @@ package explosion1 {
 			trace(s);
 		}
 
-		[Embed ("Explosion.00000.png")] private static const explosion00:Class;
-		[Embed ("Explosion.00001.png")] private static const explosion01:Class;
-		[Embed ("Explosion.00002.png")] private static const explosion02:Class;
-		[Embed ("Explosion.00003.png")] private static const explosion03:Class;
-		[Embed ("Explosion.00004.png")] private static const explosion04:Class;
-		[Embed ("Explosion.00005.png")] private static const explosion05:Class;
-		[Embed ("Explosion.00006.png")] private static const explosion06:Class;
-		[Embed ("Explosion.00007.png")] private static const explosion07:Class;
-		[Embed ("Explosion.00008.png")] private static const explosion08:Class;
-		[Embed ("Explosion.00009.png")] private static const explosion09:Class;
-		[Embed ("Explosion.00010.png")] private static const explosion10:Class;
-		[Embed ("Explosion.00011.png")] private static const explosion11:Class;
-		[Embed ("Explosion.00012.png")] private static const explosion12:Class;
-		[Embed ("Explosion.00013.png")] private static const explosion13:Class;
-		[Embed ("Explosion.00014.png")] private static const explosion14:Class;
-		[Embed ("Explosion.00015.png")] private static const explosion15:Class;
-		[Embed ("Explosion.00016.png")] private static const explosion16:Class;
-		[Embed ("Explosion.00017.png")] private static const explosion17:Class;
-		[Embed ("Explosion.00018.png")] private static const explosion18:Class;
-		[Embed ("Explosion.00019.png")] private static const explosion19:Class;
-		[Embed ("Explosion.00020.png")] private static const explosion20:Class;
-		[Embed ("Explosion.00021.png")] private static const explosion21:Class;
-		[Embed ("Explosion.00022.png")] private static const explosion22:Class;
-		[Embed ("Explosion.00023.png")] private static const explosion23:Class;
-		[Embed ("Explosion.00024.png")] private static const explosion24:Class;
-		[Embed ("Explosion.00025.png")] private static const explosion25:Class;
-		[Embed ("Explosion.00026.png")] private static const explosion26:Class;
-		[Embed ("Explosion.00027.png")] private static const explosion27:Class;
-		[Embed ("Explosion.00028.png")] private static const explosion28:Class;
-		[Embed ("Explosion.00029.png")] private static const explosion29:Class;
-		[Embed ("Explosion.00030.png")] private static const explosion30:Class;
-		[Embed ("Explosion.00031.png")] private static const explosion31:Class;
-		[Embed ("Explosion.00032.png")] private static const explosion32:Class;
-		[Embed ("Explosion.00033.png")] private static const explosion33:Class;
-		[Embed ("Explosion.00034.png")] private static const explosion34:Class;
-		[Embed ("Explosion.00035.png")] private static const explosion35:Class;
-		[Embed ("Explosion.00036.png")] private static const explosion36:Class;
-		[Embed ("Explosion.00037.png")] private static const explosion37:Class;
-		[Embed ("Explosion.00038.png")] private static const explosion38:Class;
-		[Embed ("Explosion.00039.png")] private static const explosion39:Class;
-		[Embed ("Explosion.00040.png")] private static const explosion40:Class;
-		[Embed ("Explosion.00041.png")] private static const explosion41:Class;
-		[Embed ("Explosion.00042.png")] private static const explosion42:Class;
-		[Embed ("Explosion.00043.png")] private static const explosion43:Class;
-		[Embed ("Explosion.00044.png")] private static const explosion44:Class;
-		[Embed ("Explosion.00045.png")] private static const explosion45:Class;
-		[Embed ("Explosion.00046.png")] private static const explosion46:Class;
-		[Embed ("Explosion.00047.png")] private static const explosion47:Class;
-		[Embed ("Explosion.00048.png")] private static const explosion48:Class;
-		[Embed ("Explosion.00049.png")] private static const explosion49:Class;
-		[Embed ("Explosion.00050.png")] private static const explosion50:Class;
-		[Embed ("Explosion.00051.png")] private static const explosion51:Class;
+		[Embed ("Explosion00000.png")] private static const explosion00:Class;
+		[Embed ("Explosion00001.png")] private static const explosion01:Class;
+		[Embed ("Explosion00002.png")] private static const explosion02:Class;
+		[Embed ("Explosion00003.png")] private static const explosion03:Class;
+		[Embed ("Explosion00004.png")] private static const explosion04:Class;
+		[Embed ("Explosion00005.png")] private static const explosion05:Class;
+		[Embed ("Explosion00006.png")] private static const explosion06:Class;
+		[Embed ("Explosion00007.png")] private static const explosion07:Class;
+		[Embed ("Explosion00008.png")] private static const explosion08:Class;
+		[Embed ("Explosion00009.png")] private static const explosion09:Class;
+		[Embed ("Explosion00010.png")] private static const explosion10:Class;
+		[Embed ("Explosion00011.png")] private static const explosion11:Class;
+		[Embed ("Explosion00012.png")] private static const explosion12:Class;
+		[Embed ("Explosion00013.png")] private static const explosion13:Class;
+		[Embed ("Explosion00014.png")] private static const explosion14:Class;
+		[Embed ("Explosion00015.png")] private static const explosion15:Class;
+		[Embed ("Explosion00016.png")] private static const explosion16:Class;
+		[Embed ("Explosion00017.png")] private static const explosion17:Class;
+		[Embed ("Explosion00018.png")] private static const explosion18:Class;
+		[Embed ("Explosion00019.png")] private static const explosion19:Class;
+		[Embed ("Explosion00020.png")] private static const explosion20:Class;
+		[Embed ("Explosion00021.png")] private static const explosion21:Class;
+		[Embed ("Explosion00022.png")] private static const explosion22:Class;
+		[Embed ("Explosion00023.png")] private static const explosion23:Class;
+		[Embed ("Explosion00024.png")] private static const explosion24:Class;
+		[Embed ("Explosion00025.png")] private static const explosion25:Class;
+		[Embed ("Explosion00026.png")] private static const explosion26:Class;
 
 		private var smoke:GrenadeSmoke;
 
@@ -94,7 +69,7 @@ package explosion1 {
 
 			super(400, 400);
 			alwaysOnTop = true;
-			this.originY = 1;
+//			this.originY = 1;
 
 			var materials:Vector.<Material> = new Vector.<Material>();
 			materials.push(createTextureMaterial(explosion00));
@@ -124,37 +99,11 @@ package explosion1 {
 			materials.push(createTextureMaterial(explosion24));
 			materials.push(createTextureMaterial(explosion25));
 			materials.push(createTextureMaterial(explosion26));
-			materials.push(createTextureMaterial(explosion27));
-			materials.push(createTextureMaterial(explosion28));
-			materials.push(createTextureMaterial(explosion29));
-			materials.push(createTextureMaterial(explosion30));
-			materials.push(createTextureMaterial(explosion31));
-			materials.push(createTextureMaterial(explosion32));
-			materials.push(createTextureMaterial(explosion33));
-			materials.push(createTextureMaterial(explosion34));
-			materials.push(createTextureMaterial(explosion35));
-			materials.push(createTextureMaterial(explosion36));
-			materials.push(createTextureMaterial(explosion37));
-			materials.push(createTextureMaterial(explosion38));
-			materials.push(createTextureMaterial(explosion39));
-			materials.push(createTextureMaterial(explosion40));
-			materials.push(createTextureMaterial(explosion41));
-			materials.push(createTextureMaterial(explosion42));
-			materials.push(createTextureMaterial(explosion43));
-			materials.push(createTextureMaterial(explosion44));
-			materials.push(createTextureMaterial(explosion45));
-			materials.push(createTextureMaterial(explosion46));
-			materials.push(createTextureMaterial(explosion47));
-			materials.push(createTextureMaterial(explosion48));
-			materials.push(createTextureMaterial(explosion49));
-			materials.push(createTextureMaterial(explosion50));
-			materials.push(createTextureMaterial(explosion51));
 			this.materials = materials;
 		}
 
 		override public function set frame(value:int):void {
 			super.frame = value;
-
 			smoke.frame = value;
 		}
 
