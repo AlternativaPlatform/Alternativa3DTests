@@ -144,11 +144,12 @@ package demoexample {
 
             scene.addEventListener(MouseEvent3D.MOUSE_DOWN, clickHandler);
 
-//			GrenadeExplosion.generateMaterials("Explosion.", "explosion", 51);
-//			GrenadeSmoke.generateMaterials("Smoke.", "smoke", 85);
+//			GrenadeExplosion.generateMaterials("Explosion", "explosion", 26);
+//			GrenadeSmoke.generateMaterials("Expl_Smoke00000_", "smoke", 41);
+//			GrenadeSmoke.generateMaterials("Expl_SmokeBlack00000_", "smoke", 41);
 
 //			effect = new BloodSplash();
-          effect = new GrenadeExplosion();
+	        effect = new GrenadeExplosion();
 //            effect = new GrenadeSmoke();
 
             for each (var res:Resource in effect.getResources(true)) {
