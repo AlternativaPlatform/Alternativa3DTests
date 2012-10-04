@@ -188,7 +188,7 @@ package {
 			controller.updateObjectTransform();
 
 			mainCamera.effectMode = Camera3D.MODE_SSAO_COLOR;
-			mainCamera.ssaoAngular.angleBias = 0.1;
+			mainCamera.ssaoAngular.angleThreshold = 0.1;
 			mainCamera.ssaoAngular.occludingRadius = 0.6843;
 			mainCamera.ssaoAngular.maxDistance = 1;
 			mainCamera.ssaoAngular.intensity = 0.85;
@@ -275,12 +275,12 @@ package {
 					updateParameter("Second pass size : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
 					break;
 				case Keyboard.NUMPAD_MULTIPLY:
-					mainCamera.ssaoAngular.angleBias += (event.shiftKey) ? 0.001 : 0.01;
-					updateParameter("SSAO angle bias : " + mainCamera.ssaoAngular.angleBias.toFixed(3));
+					mainCamera.ssaoAngular.angleThreshold += (event.shiftKey) ? 0.001 : 0.01;
+					updateParameter("SSAO angle bias : " + mainCamera.ssaoAngular.angleThreshold.toFixed(3));
 					break;
 				case Keyboard.NUMPAD_DIVIDE:
-					mainCamera.ssaoAngular.angleBias -= (event.shiftKey) ? 0.001 : 0.01;
-					updateParameter("SSAO angle bias : " + mainCamera.ssaoAngular.angleBias.toFixed(3));
+					mainCamera.ssaoAngular.angleThreshold -= (event.shiftKey) ? 0.001 : 0.01;
+					updateParameter("SSAO angle bias : " + mainCamera.ssaoAngular.angleThreshold.toFixed(3));
 					break;
 				case Keyboard.PERIOD:
 					mainCamera.ssaoAngular.maxDistance += (event.shiftKey) ? 0.01 : 0.1;
