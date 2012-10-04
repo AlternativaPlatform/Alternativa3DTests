@@ -146,6 +146,9 @@ package {
 
 			for (i = 0; i < parser.hierarchy.length; i++) {
 				object = parser.hierarchy[i];
+				object.scaleX = 10;
+				object.scaleY = 10;
+				object.scaleZ = 10;
 				if (!(object is Light3D)) {
 					scene.addChild(object);
 					shadow.addCaster(object);
@@ -186,12 +189,12 @@ package {
 
 			mainCamera.effectMode = Camera3D.MODE_SSAO_COLOR;
 			mainCamera.ssaoAngular.angleBias = 0.1;
-			mainCamera.ssaoAngular.size = 0.6843;
+			mainCamera.ssaoAngular.occludingRadius = 0.6843;
 			mainCamera.ssaoAngular.maxDistance = 1;
 			mainCamera.ssaoAngular.intensity = 0.85;
 			mainCamera.ssaoAngular.falloff = 7.2;
-			mainCamera.ssaoAngular.secondPassIntensity = 0.76;
-			mainCamera.ssaoAngular.secondPassSize = 0.32;
+			mainCamera.ssaoAngular.secondPassAmount = 0.76;
+			mainCamera.ssaoAngular.secondPassOccludingRadius = 0.32;
 		}
 
 		override protected function onKeyDown(event:KeyboardEvent):void {
@@ -245,31 +248,31 @@ package {
 					updateParameter("SSAO intensity : " + mainCamera.ssaoAngular.intensity.toFixed(2));
 					break;
 				case Keyboard.INSERT:
-					mainCamera.ssaoAngular.secondPassIntensity += (event.shiftKey) ? 0.005 : 0.02;
-					updateParameter("Second pass intensity : " + mainCamera.ssaoAngular.secondPassIntensity.toFixed(2));
+					mainCamera.ssaoAngular.secondPassAmount += (event.shiftKey) ? 0.005 : 0.02;
+					updateParameter("Second pass intensity : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
 					break;
 				case Keyboard.DELETE:
-					mainCamera.ssaoAngular.secondPassIntensity -= (event.shiftKey) ? 0.005 : 0.02;
-					mainCamera.ssaoAngular.secondPassIntensity = mainCamera.ssaoAngular.secondPassIntensity <= 0 ? 0 : mainCamera.ssaoAngular.secondPassIntensity;
-					updateParameter("Second pass intensity : " + mainCamera.ssaoAngular.secondPassIntensity.toFixed(2));
+					mainCamera.ssaoAngular.secondPassAmount -= (event.shiftKey) ? 0.005 : 0.02;
+					mainCamera.ssaoAngular.secondPassAmount = mainCamera.ssaoAngular.secondPassAmount <= 0 ? 0 : mainCamera.ssaoAngular.secondPassAmount;
+					updateParameter("Second pass intensity : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
 					break;
 				case  Keyboard.PAGE_UP:
-					mainCamera.ssaoAngular.size += (event.shiftKey) ? 0.01 : 0.1;
-					updateParameter("SSAO first pass size : " + mainCamera.ssaoAngular.size.toFixed(2));
+					mainCamera.ssaoAngular.occludingRadius += (event.shiftKey) ? 0.01 : 0.1;
+					updateParameter("SSAO first pass size : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
 					break;
 				case  Keyboard.PAGE_DOWN:
-					mainCamera.ssaoAngular.size -= (event.shiftKey) ? 0.01 : 0.1;
-					mainCamera.ssaoAngular.size = mainCamera.ssaoAngular.size <= 0.3 ? 0.3 : mainCamera.ssaoAngular.size;
-					updateParameter("SSAO first pass size : " + mainCamera.ssaoAngular.size.toFixed(2));
+					mainCamera.ssaoAngular.occludingRadius -= (event.shiftKey) ? 0.01 : 0.1;
+					mainCamera.ssaoAngular.occludingRadius = mainCamera.ssaoAngular.occludingRadius <= 0.3 ? 0.3 : mainCamera.ssaoAngular.occludingRadius;
+					updateParameter("SSAO first pass size : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
 					break;
 				case Keyboard.HOME:
-					mainCamera.ssaoAngular.secondPassSize += (event.shiftKey) ? 0.01 : 0.05;
-					updateParameter("Second pass size : " + mainCamera.ssaoAngular.secondPassSize.toFixed(2));
+					mainCamera.ssaoAngular.secondPassOccludingRadius += (event.shiftKey) ? 0.01 : 0.05;
+					updateParameter("Second pass size : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
 					break;
 				case Keyboard.END:
-					mainCamera.ssaoAngular.secondPassSize -= (event.shiftKey) ? 0.01 : 0.05;
-					mainCamera.ssaoAngular.secondPassSize = mainCamera.ssaoAngular.secondPassSize <= 0.3 ? 0.3 : mainCamera.ssaoAngular.secondPassSize;
-					updateParameter("Second pass size : " + mainCamera.ssaoAngular.secondPassSize.toFixed(2));
+					mainCamera.ssaoAngular.secondPassOccludingRadius -= (event.shiftKey) ? 0.01 : 0.05;
+					mainCamera.ssaoAngular.secondPassOccludingRadius = mainCamera.ssaoAngular.secondPassOccludingRadius <= 0.3 ? 0.3 : mainCamera.ssaoAngular.secondPassOccludingRadius;
+					updateParameter("Second pass size : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
 					break;
 				case Keyboard.NUMPAD_MULTIPLY:
 					mainCamera.ssaoAngular.angleBias += (event.shiftKey) ? 0.001 : 0.01;
@@ -315,8 +318,8 @@ package {
 					}
 					break;
 				case Keyboard.O:
-					mainCamera.ssaoAngular.hQuality = !mainCamera.ssaoAngular.hQuality;
-					updateParameter("SSAO second pass " + (mainCamera.ssaoAngular.hQuality ? "enabled" : "disabled"));
+					mainCamera.ssaoAngular.useSecondPass = !mainCamera.ssaoAngular.useSecondPass;
+					updateParameter("SSAO second pass " + (mainCamera.ssaoAngular.useSecondPass ? "enabled" : "disabled"));
 					break;
 				case Keyboard.I:
 					light.shadow = (light.shadow == shadow) ? null : shadow;
