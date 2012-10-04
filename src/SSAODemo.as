@@ -30,28 +30,11 @@ package {
 	[SWF (width = 800, height = 800, backgroundColor = 0, frameRate = 60)]
 	public class SSAODemo extends DefaultSceneTemplate {
 		
-//		[Embed ("resources/t2.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/Scena.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/ScenaSmooth.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/Animation1.a3d", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/AnimationTower.a3d", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/AnimationCastl3.a3d", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/castle.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/exportFix1.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/exportFix2.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/exportFix4.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/Scena2.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/1.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/scena.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/DemoScena.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
 		[Embed ("resources/DemoScenaV2.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-//		[Embed ("resources/wall.jpg")] private static const WallClass:Class;
 		[Embed ("resources/bricks.jpg")] private static const WallClass:Class;
 		[Embed ("resources/roof_ed.jpg")] private static const RoofClass:Class;
-//		[Embed ("resources/ground.jpg")] private static const GroundClass:Class;
-//		[Embed ("resources/industrial30.jpg")] private static const GroundClass:Class;
 		[Embed ("resources/ground_N.jpg")] private static const GroundClass:Class;
-		[Embed ("resources/609-normal.jpg")] private static const NormalClass:Class;
+//		[Embed ("resources/609-normal.jpg")] private static const NormalClass:Class;
 
 		private var animation:AnimationController;
 		private var _animated:Boolean = true;
