@@ -15,7 +15,6 @@ package {
 	import alternativa.engine3d.resources.BitmapTextureResource;
 	import alternativa.engine3d.shadows.DirectionalLightShadow;
 	import alternativa.utils.templates.DefaultSceneTemplate;
-	import alternativa.utils.templates.TextInfo;
 
 	import flash.display.BitmapData;
 	import flash.events.Event;
@@ -28,14 +27,18 @@ package {
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
 
-	[SWF (width = 800, height = 800, backgroundColor = 0, frameRate = 60)]
+	[SWF(width=800, height=800, backgroundColor=0, frameRate=60)]
 	public class SSAODemo extends DefaultSceneTemplate {
-		
-		[Embed ("resources/DemoScenaV2.A3D", mimeType="application/octet-stream")] private static const SceneClass:Class;
-		[Embed ("resources/bricks.jpg")] private static const WallClass:Class;
-		[Embed ("resources/roof_ed.jpg")] private static const RoofClass:Class;
-		[Embed ("resources/ground_N.jpg")] private static const GroundClass:Class;
-//		[Embed ("resources/609-normal.jpg")] private static const NormalClass:Class;
+
+		[Embed("resources/DemoScenaV2.A3D", mimeType="application/octet-stream")]
+		private static const SceneClass:Class;
+		[Embed("resources/bricks.jpg")]
+		private static const WallClass:Class;
+		[Embed("resources/roof_ed.jpg")]
+		private static const RoofClass:Class;
+		[Embed("resources/ground_N.jpg")]
+		private static const GroundClass:Class;
+		//		[Embed ("resources/609-normal.jpg")] private static const NormalClass:Class;
 
 		private var animation:AnimationController;
 		private var _animated:Boolean = true;
@@ -44,18 +47,129 @@ package {
 
 		private var displayText:TextField;
 
-		private var light:DirectionalLight;
+		private var dirLight:DirectionalLight;
 		private var shadow:DirectionalLightShadow;
 
 		private var ssaoVisible:Boolean = true;
+		private var parser:ParserA3D;
 
 		public function SSAODemo() {
 		}
 
 		override protected function initScene():void {
+
 			stage.frameRate = 40;
 			stage.color = 0x146298;
+
+			initHUD();
+
+			parser = new ParserA3D();
+			parser.parse(new SceneClass());
+
+
+			prepareMaterials();
+			prepareLightsAndShadows();
+			prepareScene();
+			prepareAnimation();
+
+			controller.speed = 40;
 			mainCamera.view.backgroundColor = 0x146298;
+			mainCamera.nearClipping = 1;
+			mainCamera.farClipping = 500;
+			mainCamera.matrix = new Matrix3D(Vector.<Number>([-0.2912704050540924, 0.9566407799720764, 0, 0, -0.4682687222957611, -0.1425747573375702, -0.8720073699951172, 0, -0.8341978192329407, -0.25398993492126465, 0.4894927442073822, 0, 52.13594436645508, 19.32925796508789, 3.971318483352661, 1]));
+			controller.updateObjectTransform();
+
+			mainCamera.effectMode = Camera3D.MODE_SSAO_COLOR;
+			mainCamera.ssaoAngular.angleThreshold = 0.1;
+			mainCamera.ssaoAngular.occludingRadius = 0.6843;
+			mainCamera.ssaoAngular.maxDistance = 1;
+			mainCamera.ssaoAngular.intensity = 0.85;
+			mainCamera.ssaoAngular.falloff = 7.2;
+			mainCamera.ssaoAngular.secondPassAmount = 0.76;
+			mainCamera.ssaoAngular.secondPassOccludingRadius = 0.32;
+		}
+
+		private function prepareMaterials():void {
+					var wall:BitmapTextureResource = new BitmapTextureResource((new WallClass()).bitmapData);
+					var roof:BitmapTextureResource = new BitmapTextureResource((new RoofClass()).bitmapData, true);
+					var ground:BitmapTextureResource = new BitmapTextureResource((new GroundClass()).bitmapData, true);
+					var normal:BitmapTextureResource = new BitmapTextureResource(new BitmapData(1, 1, false, 0x7F7FFF));
+
+					var roofMaterial:StandardMaterial = new StandardMaterial(roof, normal);
+					roofMaterial.specularPower = 0.1;
+					var wallMaterial:StandardMaterial = new StandardMaterial(wall, normal);
+					wallMaterial.specularPower = 0.1;
+					var groundMaterial:StandardMaterial = new StandardMaterial(ground, normal);
+					groundMaterial.specularPower = 0.1;
+
+					var i:int;
+					var object:Object3D;
+					for (i = 0; i < parser.objects.length; i++) {
+						object = parser.objects[i];
+						if (object is Light3D) continue;
+						var mesh:Mesh = object as Mesh;
+						if (mesh != null) {
+							for (var s:int = 0; s < mesh.numSurfaces; s++) {
+								var surface:Surface = mesh.getSurface(s);
+								var id:String = ParserMaterial(surface.material).textures["diffuse"].url;
+								if (id != null && id.toLowerCase().indexOf("roof") >= 0) {
+									surface.material = roofMaterial;
+								} else if (id != null && id.toLowerCase().indexOf("bricks") >= 0) {
+									surface.material = wallMaterial;
+								} else if (id != null && id.toLowerCase().indexOf("ground") >= 0) {
+									surface.material = groundMaterial;
+								} else {
+									trace("unknown texture: '" + id + "'");
+								}
+							}
+						}
+					}
+				}
+
+		private function prepareLightsAndShadows():void {
+			var ambient:AmbientLight = new AmbientLight(0x8bccfa);
+			ambient.intensity = 0.5;
+			scene.addChild(ambient);
+			dirLight = new DirectionalLight(0xffd98f);
+			dirLight.intensity = 1.2;
+			dirLight.z = 100;
+			dirLight.x = 100;
+			dirLight.y = -100;
+			dirLight.lookAt(0, 0, 0);
+			scene.addChild(dirLight);
+			shadow = new DirectionalLightShadow(150, 120, -130, 130, 1024,1);
+			shadow.biasMultiplier = 0.99;
+			dirLight.shadow = shadow;
+		}
+
+		private function prepareScene():void {
+					var i:int;
+					var object:Object3D;
+					for (i = 0; i < parser.hierarchy.length; i++) {
+						object = parser.hierarchy[i];
+						if (!(object is Light3D)) {
+							scene.addChild(object);
+							shadow.addCaster(object);
+						}
+					}
+				}
+
+		private function prepareAnimation():void {
+			var clip:AnimationClip = parser.animations[0];
+			clip.loop = false;
+			clip.attach(scene, true);
+			animation = new AnimationController();
+			animation.root = clip;
+			animation.freeze();
+			_animationDirection = false;
+			animationStartTime = getTimer() + 2000;
+		}
+
+
+
+
+
+		private function initHUD():void {
 			displayText = new TextField();
 			displayText.defaultTextFormat = new TextFormat("Tahoma", 15, 0x0);
 			displayText.text = "";
@@ -66,7 +180,7 @@ package {
 			var info:TextInfo = new TextInfo();
 			info.x = 10;
 			info.y = 10;
-			info.text = "Alternativa3D SSAO Demo, " + Capabilities.version + "\n";
+			info.write("Alternativa3D SSAO Demo, " + Capabilities.version + "\n");
 			info.write("WSAD and Arrows — move");
 			info.write("Q — quality low/high");
 			info.write("----");
@@ -93,108 +207,6 @@ package {
 			info.write("Home/End- — SSAO second pass size");
 			addChild(info);
 
-			graphics.beginFill(0x0, 0.3);
-			graphics.drawRoundRect(3, 3, info.textWidth + 20, info.textHeight + 20, 20, 20);
-
-			var parser:ParserA3D = new ParserA3D();
-			parser.parse(new SceneClass());
-
-//			var texture:BitmapTextureResource = new BitmapTextureResource(new BitmapData(1, 1, false, 0x7F7F7F));
-//			var texture:BitmapTextureResource = new BitmapTextureResource((new TextureClass()).bitmapData);
-			var wall:BitmapTextureResource = new BitmapTextureResource((new WallClass()).bitmapData);
-			var roof:BitmapTextureResource = new BitmapTextureResource((new RoofClass()).bitmapData, true);
-			var ground:BitmapTextureResource = new BitmapTextureResource((new GroundClass()).bitmapData, true);
-			var normal:BitmapTextureResource = new BitmapTextureResource(new BitmapData(1, 1, false, 0x7F7FFF));
-//			var normal:BitmapTextureResource = new BitmapTextureResource(new NormalClass().bitmapData);
-
-			shadow = new DirectionalLightShadow(150, 120, -130, 130, 512, 1);
-//			shadow.debug = true;
-			shadow.biasMultiplier = 0.99;
-
-//			var defaultMaterial:StandardMaterial = new StandardMaterial(texture, normal);
-//			defaultMaterial.specularPower = 0.1;
-			var roofMaterial:StandardMaterial = new StandardMaterial(roof, normal);
-			roofMaterial.specularPower = 0.1;
-			var wallMaterial:StandardMaterial = new StandardMaterial(wall, normal);
-			wallMaterial.specularPower = 0.1;
-			var groundMaterial:StandardMaterial = new StandardMaterial(ground, normal);
-			groundMaterial.specularPower = 0.1;
-
-			var i:int;
-			var object:Object3D;
-			for (i = 0; i < parser.objects.length; i++) {
-				object = parser.objects[i];
-				if (object is Light3D) continue;
-				var mesh:Mesh = object as Mesh;
-				if (mesh != null) {
-					for (var s:int = 0; s < mesh.numSurfaces; s++) {
-						var surface:Surface = mesh.getSurface(s);
-						var id:String = ParserMaterial(surface.material).textures["diffuse"].url;
-						if (id != null && id.toLowerCase().indexOf("roof") >= 0) {
-							surface.material = roofMaterial;
-						} else if (id != null && id.toLowerCase().indexOf("bricks") >= 0) {
-							surface.material = wallMaterial;
-						} else if (id != null && id.toLowerCase().indexOf("ground") >= 0) {
-							surface.material = groundMaterial;
-						} else {
-							trace("unknown texture: '" + id + "'");
-						}
-//						surface.material = defaultMaterial;
-					}
-				}
-			}
-
-			for (i = 0; i < parser.hierarchy.length; i++) {
-				object = parser.hierarchy[i];
-				object.scaleX = 10;
-				object.scaleY = 10;
-				object.scaleZ = 10;
-				if (!(object is Light3D)) {
-					scene.addChild(object);
-					shadow.addCaster(object);
-				}
-			}
-
-			var clip:AnimationClip = parser.animations[0];
-			clip.loop = false;
-			clip.attach(scene, true);
-			animation = new AnimationController();
-			animation.root = clip;
-
-//			_animated = false;
-			animation.freeze();
-			_animationDirection = false;
-			animationStartTime = getTimer() + 2000;
-
-			var ambient:AmbientLight = new AmbientLight(0x8bccfa);
-			ambient.intensity = 0.5;
-			scene.addChild(ambient);
-
-			light = new DirectionalLight(0xffd98f);
-			light.intensity = 1.2;
-			light.z = 100;
-			light.x = 100;
-			light.y = -100;
-			light.lookAt(0, 0, 0);
-			scene.addChild(light);
-
-//			shadow.debug = true;
-			light.shadow = shadow;
-
-			controller.speed = 40;
-			mainCamera.nearClipping = 1;
-			mainCamera.farClipping = 500;
-			mainCamera.matrix = new Matrix3D(Vector.<Number>([-0.2912704050540924,0.9566407799720764,0,0,-0.4682687222957611,-0.1425747573375702,-0.8720073699951172,0,-0.8341978192329407,-0.25398993492126465,0.4894927442073822,0,52.13594436645508,19.32925796508789,3.971318483352661,1]));
-			controller.updateObjectTransform();
-
-			mainCamera.effectMode = Camera3D.MODE_SSAO_COLOR;
-			mainCamera.ssaoAngular.angleThreshold = 0.1;
-			mainCamera.ssaoAngular.occludingRadius = 0.6843;
-			mainCamera.ssaoAngular.maxDistance = 1;
-			mainCamera.ssaoAngular.intensity = 0.85;
-			mainCamera.ssaoAngular.falloff = 7.2;
-			mainCamera.ssaoAngular.secondPassAmount = 0.76;
-			mainCamera.ssaoAngular.secondPassOccludingRadius = 0.32;
 		}
 
 		override protected function onKeyDown(event:KeyboardEvent):void {
@@ -202,19 +214,19 @@ package {
 			switch (event.keyCode) {
 				case Keyboard.NUMBER_1:
 					mainCamera.effectMode = ssaoVisible ? Camera3D.MODE_SSAO_COLOR : Camera3D.MODE_COLOR;
-					updateParameter("Normal render mode");
+					printMessage("Normal render mode");
 					break;
 				case Keyboard.NUMBER_2:
 					mainCamera.effectMode = Camera3D.MODE_SSAO_ONLY;
-					updateParameter("Raw SSAO render mode");
+					printMessage("Raw SSAO render mode");
 					break;
 				case Keyboard.NUMBER_3:
 					mainCamera.effectMode = Camera3D.MODE_DEPTH;
-					updateParameter("Z-buffer render mode");
+					printMessage("Z-buffer render mode");
 					break;
 				case Keyboard.NUMBER_4:
 					mainCamera.effectMode = Camera3D.MODE_NORMALS;
-					updateParameter("Screen-space normals render mode");
+					printMessage("Screen-space normals render mode");
 					break;
 				case Keyboard.SPACE:
 					_animated = !_animated;
@@ -230,104 +242,92 @@ package {
 					if (mainCamera.view.antiAlias == 0) {
 						// low
 						mainCamera.ssaoScale = 1;
-						updateParameter("Quality low");
+						printMessage("Quality low");
 					} else {
 						mainCamera.ssaoScale = 0;
-						updateParameter("Quality high");
+						printMessage("Quality high");
 					}
 					break;
 				case Keyboard.EQUAL:
 				case Keyboard.NUMPAD_ADD:
 					mainCamera.ssaoAngular.intensity += (event.shiftKey) ? 0.01 : 0.05;
-					updateParameter("SSAO intensity : " + mainCamera.ssaoAngular.intensity.toFixed(2));
+					printMessage("SSAO intensity : " + mainCamera.ssaoAngular.intensity.toFixed(2));
 					break;
 				case Keyboard.MINUS:
 				case Keyboard.NUMPAD_SUBTRACT:
 					mainCamera.ssaoAngular.intensity -= (event.shiftKey) ? 0.01 : 0.05;
 					mainCamera.ssaoAngular.intensity = mainCamera.ssaoAngular.intensity <= 0 ? 0 : mainCamera.ssaoAngular.intensity;
-					updateParameter("SSAO intensity : " + mainCamera.ssaoAngular.intensity.toFixed(2));
+					printMessage("SSAO intensity : " + mainCamera.ssaoAngular.intensity.toFixed(2));
 					break;
 				case Keyboard.INSERT:
 					mainCamera.ssaoAngular.secondPassAmount += (event.shiftKey) ? 0.005 : 0.02;
-					updateParameter("Second pass intensity : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
+					printMessage("Second pass intensity : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
 					break;
 				case Keyboard.DELETE:
 					mainCamera.ssaoAngular.secondPassAmount -= (event.shiftKey) ? 0.005 : 0.02;
 					mainCamera.ssaoAngular.secondPassAmount = mainCamera.ssaoAngular.secondPassAmount <= 0 ? 0 : mainCamera.ssaoAngular.secondPassAmount;
-					updateParameter("Second pass intensity : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
+					printMessage("Second pass intensity : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
 					break;
 				case  Keyboard.PAGE_UP:
 					mainCamera.ssaoAngular.occludingRadius += (event.shiftKey) ? 0.01 : 0.1;
-					updateParameter("SSAO first pass size : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
+					printMessage("SSAO first pass size : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
 					break;
 				case  Keyboard.PAGE_DOWN:
 					mainCamera.ssaoAngular.occludingRadius -= (event.shiftKey) ? 0.01 : 0.1;
 					mainCamera.ssaoAngular.occludingRadius = mainCamera.ssaoAngular.occludingRadius <= 0.3 ? 0.3 : mainCamera.ssaoAngular.occludingRadius;
-					updateParameter("SSAO first pass size : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
+					printMessage("SSAO first pass size : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
 					break;
 				case Keyboard.HOME:
 					mainCamera.ssaoAngular.secondPassOccludingRadius += (event.shiftKey) ? 0.01 : 0.05;
-					updateParameter("Second pass size : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
+					printMessage("Second pass size : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
 					break;
 				case Keyboard.END:
 					mainCamera.ssaoAngular.secondPassOccludingRadius -= (event.shiftKey) ? 0.01 : 0.05;
 					mainCamera.ssaoAngular.secondPassOccludingRadius = mainCamera.ssaoAngular.secondPassOccludingRadius <= 0.3 ? 0.3 : mainCamera.ssaoAngular.secondPassOccludingRadius;
-					updateParameter("Second pass size : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
+					printMessage("Second pass size : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
 					break;
 				case Keyboard.NUMPAD_MULTIPLY:
 					mainCamera.ssaoAngular.angleThreshold += (event.shiftKey) ? 0.001 : 0.01;
-					updateParameter("SSAO angle bias : " + mainCamera.ssaoAngular.angleThreshold.toFixed(3));
+					printMessage("SSAO angle bias : " + mainCamera.ssaoAngular.angleThreshold.toFixed(3));
 					break;
 				case Keyboard.NUMPAD_DIVIDE:
 					mainCamera.ssaoAngular.angleThreshold -= (event.shiftKey) ? 0.001 : 0.01;
-					updateParameter("SSAO angle bias : " + mainCamera.ssaoAngular.angleThreshold.toFixed(3));
+					printMessage("SSAO angle bias : " + mainCamera.ssaoAngular.angleThreshold.toFixed(3));
 					break;
 				case Keyboard.PERIOD:
 					mainCamera.ssaoAngular.maxDistance += (event.shiftKey) ? 0.01 : 0.1;
-					updateParameter("SSAO max distance : " + mainCamera.ssaoAngular.maxDistance.toFixed(2));
+					printMessage("SSAO max distance : " + mainCamera.ssaoAngular.maxDistance.toFixed(2));
 					break;
 				case Keyboard.COMMA:
 					mainCamera.ssaoAngular.maxDistance -= (event.shiftKey) ? 0.01 : 0.1;
-					updateParameter("SSAO max distance : " + mainCamera.ssaoAngular.maxDistance.toFixed(2));
+					printMessage("SSAO max distance : " + mainCamera.ssaoAngular.maxDistance.toFixed(2));
 					break;
 				case Keyboard.NUMBER_9:
 					mainCamera.ssaoAngular.falloff += (event.shiftKey) ? 0.01 : 0.1;
-					updateParameter("SSAO distance falloff : " + mainCamera.ssaoAngular.falloff.toFixed(2));
+					printMessage("SSAO distance falloff : " + mainCamera.ssaoAngular.falloff.toFixed(2));
 					break;
 				case Keyboard.NUMBER_0:
 					mainCamera.ssaoAngular.falloff -= (event.shiftKey) ? 0.01 : 0.1;
-					updateParameter("SSAO distance falloff : " + mainCamera.ssaoAngular.falloff.toFixed(2));
+					printMessage("SSAO distance falloff : " + mainCamera.ssaoAngular.falloff.toFixed(2));
 					break;
-//				case Keyboard.LEFTBRACKET:
-//					mainCamera.depthScale++;
-//					break;
-//				case Keyboard.RIGHTBRACKET:
-//					mainCamera.depthScale--;
-//					break;
-//				case Keyboard.SEMICOLON:
-//					mainCamera.ssaoScale++;
-//					break;
-//				case Keyboard.QUOTE:
-//					mainCamera.ssaoScale--;
-//					break;
 				case Keyboard.U:
 					if (mainCamera.effectMode == Camera3D.MODE_COLOR || mainCamera.effectMode == Camera3D.MODE_SSAO_COLOR) {
 						ssaoVisible = !ssaoVisible;
 						mainCamera.effectMode = (ssaoVisible ? Camera3D.MODE_SSAO_COLOR : Camera3D.MODE_COLOR);
-						updateParameter("SSAO " + (ssaoVisible ? "enabled" : "disabled"));
+						printMessage("SSAO " + (ssaoVisible ? "enabled" : "disabled"));
 					}
 					break;
 				case Keyboard.O:
 					mainCamera.ssaoAngular.useSecondPass = !mainCamera.ssaoAngular.useSecondPass;
-					updateParameter("SSAO second pass " + (mainCamera.ssaoAngular.useSecondPass ? "enabled" : "disabled"));
+					printMessage("SSAO second pass " + (mainCamera.ssaoAngular.useSecondPass ? "enabled" : "disabled"));
 					break;
 				case Keyboard.I:
-					light.shadow = (light.shadow == shadow) ? null : shadow;
-					updateParameter("Shadows " + (light.shadow != null ? "enabled" : "disabled"));
+					dirLight.shadow = (dirLight.shadow == shadow) ? null : shadow;
+					printMessage("Shadows " + (dirLight.shadow != null ? "enabled" : "disabled"));
 					break;
 				case Keyboard.B:
 					mainCamera.blurEnabled = !mainCamera.blurEnabled;
-					updateParameter("SSAO blur " + (mainCamera.blurEnabled ? "enabled" : "disabled"));
+					printMessage("SSAO blur " + (mainCamera.blurEnabled ? "enabled" : "disabled"));
 					break;
 			}
 		}
@@ -340,7 +340,7 @@ package {
 			}
 		}
 
-		private function updateParameter(text:String):void {
+		private function printMessage(text:String):void {
 			var color:uint = (mainCamera.effectMode == Camera3D.MODE_COLOR || mainCamera.effectMode == Camera3D.MODE_SSAO_COLOR || mainCamera.effectMode == Camera3D.MODE_NORMALS) ? 0xFFFFFF : 0x0;
 
 			displayText.defaultTextFormat = new TextFormat("Tahoma", 15, color);
@@ -349,6 +349,7 @@ package {
 		}
 
 		private var animationStartTime:int = -1;
+
 		override protected function onEnterFrame(e:Event):void {
 			if (animation.root is AnimationClip) {
 				if (animationStartTime == -1) {
@@ -369,8 +370,42 @@ package {
 
 		override protected function onResize(event:Event = null):void {
 			super.onResize(event);
-			updateParameter(displayText.text);
+			printMessage(displayText.text);
 		}
 
+	}
+}
+
+import flash.display.Sprite;
+import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
+import flash.text.TextFormat;
+
+
+class TextInfo extends Sprite {
+	private var textField:TextField;
+	private var bg:Sprite;
+
+	public function TextInfo() {
+		bg = new Sprite();
+		with (bg.graphics) {
+			beginFill(0x000000, .75);
+			drawRect(0, 0, 10, 10);
+			endFill();
+		}
+		textField = new TextField();
+		textField.autoSize = TextFieldAutoSize.LEFT;
+		textField.selectable = false;
+		textField.defaultTextFormat = new TextFormat("Tahoma", 10, 0xFFFFFF);
+		textField.x = 5;
+		textField.y = 5;
+		addChild(bg);
+		addChild(textField);
+	}
+
+	public function write(value:String):void {
+		textField.appendText(value + "\n");
+		bg.width = textField.width + 10;
+		bg.height = textField.height + 10;
 	}
 }
