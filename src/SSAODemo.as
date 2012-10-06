@@ -90,41 +90,41 @@ package {
 		}
 
 		private function prepareMaterials():void {
-					var wall:BitmapTextureResource = new BitmapTextureResource((new WallClass()).bitmapData);
-					var roof:BitmapTextureResource = new BitmapTextureResource((new RoofClass()).bitmapData, true);
-					var ground:BitmapTextureResource = new BitmapTextureResource((new GroundClass()).bitmapData, true);
-					var normal:BitmapTextureResource = new BitmapTextureResource(new BitmapData(1, 1, false, 0x7F7FFF));
+			var wall:BitmapTextureResource = new BitmapTextureResource((new WallClass()).bitmapData);
+			var roof:BitmapTextureResource = new BitmapTextureResource((new RoofClass()).bitmapData, true);
+			var ground:BitmapTextureResource = new BitmapTextureResource((new GroundClass()).bitmapData, true);
+			var normal:BitmapTextureResource = new BitmapTextureResource(new BitmapData(1, 1, false, 0x7F7FFF));
 
-					var roofMaterial:StandardMaterial = new StandardMaterial(roof, normal);
-					roofMaterial.specularPower = 0.1;
-					var wallMaterial:StandardMaterial = new StandardMaterial(wall, normal);
-					wallMaterial.specularPower = 0.1;
-					var groundMaterial:StandardMaterial = new StandardMaterial(ground, normal);
-					groundMaterial.specularPower = 0.1;
+			var roofMaterial:StandardMaterial = new StandardMaterial(roof, normal);
+			roofMaterial.specularPower = 0.1;
+			var wallMaterial:StandardMaterial = new StandardMaterial(wall, normal);
+			wallMaterial.specularPower = 0.1;
+			var groundMaterial:StandardMaterial = new StandardMaterial(ground, normal);
+			groundMaterial.specularPower = 0.1;
 
-					var i:int;
-					var object:Object3D;
-					for (i = 0; i < parser.objects.length; i++) {
-						object = parser.objects[i];
-						if (object is Light3D) continue;
-						var mesh:Mesh = object as Mesh;
-						if (mesh != null) {
-							for (var s:int = 0; s < mesh.numSurfaces; s++) {
-								var surface:Surface = mesh.getSurface(s);
-								var id:String = ParserMaterial(surface.material).textures["diffuse"].url;
-								if (id != null && id.toLowerCase().indexOf("roof") >= 0) {
-									surface.material = roofMaterial;
-								} else if (id != null && id.toLowerCase().indexOf("bricks") >= 0) {
-									surface.material = wallMaterial;
-								} else if (id != null && id.toLowerCase().indexOf("ground") >= 0) {
-									surface.material = groundMaterial;
-								} else {
-									trace("unknown texture: '" + id + "'");
-								}
-							}
+			var i:int;
+			var object:Object3D;
+			for (i = 0; i < parser.objects.length; i++) {
+				object = parser.objects[i];
+				if (object is Light3D) continue;
+				var mesh:Mesh = object as Mesh;
+				if (mesh != null) {
+					for (var s:int = 0; s < mesh.numSurfaces; s++) {
+						var surface:Surface = mesh.getSurface(s);
+						var id:String = ParserMaterial(surface.material).textures["diffuse"].url;
+						if (id != null && id.toLowerCase().indexOf("roof") >= 0) {
+							surface.material = roofMaterial;
+						} else if (id != null && id.toLowerCase().indexOf("bricks") >= 0) {
+							surface.material = wallMaterial;
+						} else if (id != null && id.toLowerCase().indexOf("ground") >= 0) {
+							surface.material = groundMaterial;
+						} else {
+							trace("unknown texture: '" + id + "'");
 						}
 					}
 				}
+			}
+		}
 
 		private function prepareLightsAndShadows():void {
 			var ambient:AmbientLight = new AmbientLight(0x8bccfa);
@@ -143,16 +143,16 @@ package {
 		}
 
 		private function prepareScene():void {
-					var i:int;
-					var object:Object3D;
-					for (i = 0; i < parser.hierarchy.length; i++) {
-						object = parser.hierarchy[i];
-						if (!(object is Light3D)) {
-							scene.addChild(object);
-							shadow.addCaster(object);
-						}
-					}
+			var i:int;
+			var object:Object3D;
+			for (i = 0; i < parser.hierarchy.length; i++) {
+				object = parser.hierarchy[i];
+				if (!(object is Light3D)) {
+					scene.addChild(object);
+					shadow.addCaster(object);
 				}
+			}
+		}
 
 		private function prepareAnimation():void {
 			var clip:AnimationClip = parser.animations[0];
@@ -164,10 +164,6 @@ package {
 			_animationDirection = false;
 			animationStartTime = getTimer() + 2000;
 		}
-
-
-
-
 
 		private function initHUD():void {
 			displayText = new TextField();
@@ -381,7 +377,6 @@ import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 
-
 class TextInfo extends Sprite {
 	private var textField:TextField;
 	private var bg:Sprite;
@@ -389,7 +384,7 @@ class TextInfo extends Sprite {
 	public function TextInfo() {
 		bg = new Sprite();
 		with (bg.graphics) {
-			beginFill(0x000000, .75);
+			beginFill(0x000000, .6);
 			drawRect(0, 0, 10, 10);
 			endFill();
 		}
