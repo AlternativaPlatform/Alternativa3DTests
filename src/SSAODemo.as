@@ -27,6 +27,10 @@ package {
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
 
+	/**
+	 * This demo requires Alternativa3D "SSAO Edition".
+	 * Read details here
+	 */
 	[SWF(width=800, height=800, backgroundColor=0, frameRate=60)]
 	public class SSAODemo extends DefaultSceneTemplate {
 
@@ -79,12 +83,16 @@ package {
 			controller.updateObjectTransform();
 
 			mainCamera.effectMode = Camera3D.MODE_SSAO_COLOR;
-			mainCamera.ssaoAngular.occludingRadius = 0.6843;
-			mainCamera.ssaoAngular.maxDistance = 1;
-			mainCamera.ssaoAngular.intensity = 0.85;
-			mainCamera.ssaoAngular.falloff = 7.2;
-			mainCamera.ssaoAngular.secondPassAmount = 0.76;
+			// Following four parameters are depending on scene dimension / camera dimension ratio
+			// We relied that in the current scene the camera sees about 30 units of 3d space
+			// And the broken house has similar size
+			mainCamera.ssaoAngular.occludingRadius = 0.7;
 			mainCamera.ssaoAngular.secondPassOccludingRadius = 0.32;
+			mainCamera.ssaoAngular.maxDistance = 1;
+			mainCamera.ssaoAngular.falloff = 7.2;
+
+			mainCamera.ssaoAngular.intensity = 0.85;
+			mainCamera.ssaoAngular.secondPassAmount = 0.76;
 		}
 
 		private function prepareMaterials():void {
@@ -195,7 +203,7 @@ package {
 			info.write("+/- — SSAO intensity");
 			info.write("9/0 — SSAO first pass occluding radius");
 			info.write("Page_Up/Page_Down — SSAO second pass amount");
-			info.write("Insert/Delete — SSAO second pass occluding radius");
+			info.write("Home/End — SSAO second pass occluding radius");
 			addChild(info);
 		}
 
