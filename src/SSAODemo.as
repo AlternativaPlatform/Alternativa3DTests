@@ -38,7 +38,6 @@ package {
 		private static const RoofClass:Class;
 		[Embed("resources/ground_N.jpg")]
 		private static const GroundClass:Class;
-		//		[Embed ("resources/609-normal.jpg")] private static const NormalClass:Class;
 
 		private var animation:AnimationController;
 		private var _animated:Boolean = true;
@@ -66,7 +65,6 @@ package {
 			parser = new ParserA3D();
 			parser.parse(new SceneClass());
 
-
 			prepareMaterials();
 			prepareLightsAndShadows();
 			prepareScene();
@@ -77,10 +75,10 @@ package {
 			mainCamera.nearClipping = 1;
 			mainCamera.farClipping = 500;
 			mainCamera.matrix = new Matrix3D(Vector.<Number>([-0.2912704050540924, 0.9566407799720764, 0, 0, -0.4682687222957611, -0.1425747573375702, -0.8720073699951172, 0, -0.8341978192329407, -0.25398993492126465, 0.4894927442073822, 0, 52.13594436645508, 19.32925796508789, 3.971318483352661, 1]));
+			controller.smoothingDelay = 0.7;
 			controller.updateObjectTransform();
 
 			mainCamera.effectMode = Camera3D.MODE_SSAO_COLOR;
-			mainCamera.ssaoAngular.angleThreshold = 0.1;
 			mainCamera.ssaoAngular.occludingRadius = 0.6843;
 			mainCamera.ssaoAngular.maxDistance = 1;
 			mainCamera.ssaoAngular.intensity = 0.85;
@@ -137,8 +135,8 @@ package {
 			dirLight.y = -100;
 			dirLight.lookAt(0, 0, 0);
 			scene.addChild(dirLight);
-			shadow = new DirectionalLightShadow(150, 120, -130, 130, 1024,1);
-			shadow.biasMultiplier = 0.99;
+			shadow = new DirectionalLightShadow(150, 120, -130, 130, 512, 1);
+			shadow.biasMultiplier = 0.993;
 			dirLight.shadow = shadow;
 		}
 
@@ -181,14 +179,12 @@ package {
 			info.write("Q — quality low/high");
 			info.write("----");
 
-			// Режимы дебага
 			info.write("1 — default mode");
 			info.write("2 — raw SSAO mode");
 			info.write("3 — z-buffer mode");
 			info.write("4 — screen-space normals mode");
 			info.write("----");
 
-			// Переключение теней, SSAO, проходок
 			info.write("U — toggle SSAO on/off");
 			info.write("I — toggle shadows on/off");
 			info.write("O — toggle SSAO second pass on/off");
@@ -196,13 +192,11 @@ package {
 			info.write("R — rewind animation");
 			info.write("----");
 
-			// Настройка SSAO
 			info.write("+/- — SSAO intensity");
-			info.write("PG_Up/PG_Down — SSAO first pass size");
-			info.write("Insert/Delete — SSAO second pass intensity");
-			info.write("Home/End- — SSAO second pass size");
+			info.write("9/0 — SSAO first pass occluding radius");
+			info.write("Page_Up/Page_Down — SSAO second pass amount");
+			info.write("Insert/Delete — SSAO second pass occluding radius");
 			addChild(info);
-
 		}
 
 		override protected function onKeyDown(event:KeyboardEvent):void {
@@ -255,32 +249,34 @@ package {
 					mainCamera.ssaoAngular.intensity = mainCamera.ssaoAngular.intensity <= 0 ? 0 : mainCamera.ssaoAngular.intensity;
 					printMessage("SSAO intensity : " + mainCamera.ssaoAngular.intensity.toFixed(2));
 					break;
-				case Keyboard.INSERT:
+				case Keyboard.PAGE_UP:
 					mainCamera.ssaoAngular.secondPassAmount += (event.shiftKey) ? 0.005 : 0.02;
-					printMessage("Second pass intensity : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
+					printMessage("Second pass amount : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
 					break;
-				case Keyboard.DELETE:
+				case Keyboard.PAGE_DOWN:
 					mainCamera.ssaoAngular.secondPassAmount -= (event.shiftKey) ? 0.005 : 0.02;
 					mainCamera.ssaoAngular.secondPassAmount = mainCamera.ssaoAngular.secondPassAmount <= 0 ? 0 : mainCamera.ssaoAngular.secondPassAmount;
-					printMessage("Second pass intensity : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
+					printMessage("Second pass amount : " + mainCamera.ssaoAngular.secondPassAmount.toFixed(2));
 					break;
-				case  Keyboard.PAGE_UP:
+				case  Keyboard.NUMBER_0:
+				case  Keyboard.NUMPAD_0:
 					mainCamera.ssaoAngular.occludingRadius += (event.shiftKey) ? 0.01 : 0.1;
-					printMessage("SSAO first pass size : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
+					printMessage("SSAO first pass occluding radius : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
 					break;
-				case  Keyboard.PAGE_DOWN:
+				case  Keyboard.NUMBER_9:
+				case  Keyboard.NUMPAD_9:
 					mainCamera.ssaoAngular.occludingRadius -= (event.shiftKey) ? 0.01 : 0.1;
 					mainCamera.ssaoAngular.occludingRadius = mainCamera.ssaoAngular.occludingRadius <= 0.3 ? 0.3 : mainCamera.ssaoAngular.occludingRadius;
-					printMessage("SSAO first pass size : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
+					printMessage("SSAO first pass occluding radius : " + mainCamera.ssaoAngular.occludingRadius.toFixed(2));
 					break;
 				case Keyboard.HOME:
 					mainCamera.ssaoAngular.secondPassOccludingRadius += (event.shiftKey) ? 0.01 : 0.05;
-					printMessage("Second pass size : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
+					printMessage("Second pass occluding radius : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
 					break;
 				case Keyboard.END:
 					mainCamera.ssaoAngular.secondPassOccludingRadius -= (event.shiftKey) ? 0.01 : 0.05;
 					mainCamera.ssaoAngular.secondPassOccludingRadius = mainCamera.ssaoAngular.secondPassOccludingRadius <= 0.3 ? 0.3 : mainCamera.ssaoAngular.secondPassOccludingRadius;
-					printMessage("Second pass size : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
+					printMessage("Second pass occluding radius : " + mainCamera.ssaoAngular.secondPassOccludingRadius.toFixed(2));
 					break;
 				case Keyboard.NUMPAD_MULTIPLY:
 					mainCamera.ssaoAngular.angleThreshold += (event.shiftKey) ? 0.001 : 0.01;
@@ -298,11 +294,11 @@ package {
 					mainCamera.ssaoAngular.maxDistance -= (event.shiftKey) ? 0.01 : 0.1;
 					printMessage("SSAO max distance : " + mainCamera.ssaoAngular.maxDistance.toFixed(2));
 					break;
-				case Keyboard.NUMBER_9:
+				case Keyboard.M:
 					mainCamera.ssaoAngular.falloff += (event.shiftKey) ? 0.01 : 0.1;
 					printMessage("SSAO distance falloff : " + mainCamera.ssaoAngular.falloff.toFixed(2));
 					break;
-				case Keyboard.NUMBER_0:
+				case Keyboard.N:
 					mainCamera.ssaoAngular.falloff -= (event.shiftKey) ? 0.01 : 0.1;
 					printMessage("SSAO distance falloff : " + mainCamera.ssaoAngular.falloff.toFixed(2));
 					break;
